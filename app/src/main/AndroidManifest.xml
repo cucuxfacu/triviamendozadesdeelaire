@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.PreguntadosMendozaDesdeElAire"
+        tools:targetApi="31">
+        <!--App ID Bonificado Dev:  ca-app-pub-3940256099942544~5224354917 -->
+        <!--App ID Bonificado Prod: ca-app-pub-9816948408338668~8651017186 -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-9816948408338668~8651017186"/>
+
+        <meta-data android:name="com.google.android.gms.games.APP_ID"
+            android:value="@string/app_id" />
+
+        <meta-data android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version"/>
+        <meta-data
+            android:name="com.google.android.gms.ads.flag.OPTIMIZE_INITIALIZATION"
+            android:value="true"/>
+        <meta-data
+            android:name="com.google.android.gms.ads.flag.OPTIMIZE_AD_LOADING"
+            android:value="true"/>
+        <activity
+            android:name=".TriviaMendozaActivity"
+            android:exported="true"
+            android:theme="@style/Theme.PreguntadosMendozaDesdeElAire.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

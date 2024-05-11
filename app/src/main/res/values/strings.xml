@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Trivias Mendoza desde el aire</string>
+    <string name="app_loading">Cargando...</string>
+    <string name="app_back">Volver</string>
+
+    <string name="app_id" translatable="false">152959019730</string>
+</resources>
