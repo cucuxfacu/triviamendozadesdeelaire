@@ -87,7 +87,7 @@ public class SplashScreens extends ManagedSplashScreen {
 
 			@Override
 			public void onModifierStarted(final IModifier<IEntity> pModifier, final IEntity pItem) {
-				//SFXManager.PlayIntro();
+				SFXManager.PlayIntro();
 			}
 		});
 
@@ -95,7 +95,7 @@ public class SplashScreens extends ManagedSplashScreen {
 			@Override
 			public void onModifierFinished(final IModifier<IEntity> pModifier, final IEntity pItem) {
 				//InAppConsent.getInstance().GetCosent();
-				SceneManager.getInstance().showMainMenu();
+				SceneManager.getInstance().ShowLoginMenu();
 			}
 
 			@Override
@@ -105,7 +105,7 @@ public class SplashScreens extends ManagedSplashScreen {
 					SharedResources.writeStringToSharedPreferences(SharedResources.SHARED_PREFS_MUSIC_VOLUMEN, "1");
 				}
 
-				//SFXManager.playMusic();
+				SFXManager.playMusic();
 
 				if (SharedResources.getIntFromSharedPreferences(SharedResources.SHARED_PREFS_MUSIC_MUTED) > 0)
 					SFXManager.setMusicMuted(true);

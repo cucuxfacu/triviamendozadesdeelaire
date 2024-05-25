@@ -7,6 +7,7 @@ import org.andengine.entity.scene.Scene;
 
 import ccx.gamestudio.triviamendoza.Layers.ManagedLayer;
 import ccx.gamestudio.triviamendoza.ManagedScene;
+import ccx.gamestudio.triviamendoza.Menus.LoginMenu;
 import ccx.gamestudio.triviamendoza.Menus.MainMenu;
 
 public class SceneManager {
@@ -74,6 +75,10 @@ public class SceneManager {
 
 	public void showMainMenu() {
 		showScene(MainMenu.getInstance());
+	}
+
+	public void ShowLoginMenu(){
+		showScene(LoginMenu.getInstance());
 	}
 
 	public void showScene(final ManagedScene pManagedScene) {

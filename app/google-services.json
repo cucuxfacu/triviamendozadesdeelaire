@@ -1,0 +1,62 @@
+{
+  "project_info": {
+    "project_number": "120799424963",
+    "project_id": "triviamendoza-775a2",
+    "storage_bucket": "triviamendoza-775a2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:120799424963:android:e44b2288bd4ea40d030d76",
+        "android_client_info": {
+          "package_name": "ccx.gamestudio.triviamendoza"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "120799424963-kjcj22dfggc9s80j8gc7jp98dj7oihb3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ccx.gamestudio.triviamendoza",
+            "certificate_hash": "9bbb3186b2189ef16d8f272bdab59362c395cbb4"
+          }
+        },
+        {
+          "client_id": "120799424963-kmideca0st6m7eqllsm9rcm1qtogtpub.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ccx.gamestudio.triviamendoza",
+            "certificate_hash": "6abdc599cf32479ef6793c9154ed1f467394398d"
+          }
+        },
+        {
+          "client_id": "120799424963-c4bsls9nlvv2hlo3hb28moipv5q5nl2l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBVyXu7xT1THDFjk0-3puATode4l80sR1k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "120799424963-c4bsls9nlvv2hlo3hb28moipv5q5nl2l.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "120799424963-bp8lum44bble6st0r2f7ug20uc399thi.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "ccx.gamestudio.triviamendoza"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

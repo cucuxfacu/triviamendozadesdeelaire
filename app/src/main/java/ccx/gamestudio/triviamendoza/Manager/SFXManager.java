@@ -8,6 +8,8 @@ import org.andengine.util.debug.Debug;
 
 import java.io.IOException;
 
+import ccx.gamestudio.triviamendoza.Helpers.SharedResources;
+
 
 public class SFXManager
 {
@@ -15,14 +17,10 @@ public class SFXManager
 	// CONSTANTS
 	// ====================================================
 	private static final SFXManager INSTANCE = new SFXManager();
-	
 	private static Music mMusicMenu;
-	private static Music mMusicGame;
-
 	private static Sound mClick;
 	private static Sound mClose;
 	private static Sound mcoin;
-	private static Sound mWaterSplash;
 	private static Sound mIntro;
 	
 	// ====================================================
@@ -47,8 +45,6 @@ public class SFXManager
 		try {
 			mMusicMenu = MusicFactory.createMusicFromAsset(ResourceManager.getActivity().getMusicManager(), ResourceManager.getActivity(), "MusicMainMenu.mp3");
 			mMusicMenu.setLooping(true);
-			mMusicGame = MusicFactory.createMusicFromAsset(ResourceManager.getActivity().getMusicManager(), ResourceManager.getActivity(), "MusicGamePlay.mp3");
-			mMusicGame.setLooping(true);
 		} catch (final IOException e) {
 			Debug.e(e);
 		}
@@ -62,12 +58,10 @@ public class SFXManager
 			mClose = SoundFactory.createSoundFromAsset(ResourceManager.getActivity().getSoundManager(), ResourceManager.getActivity(), "close.mp3");
 		} catch (final IOException e) { Debug.e(e); }
 
-
 		try {
 			mIntro = SoundFactory.createSoundFromAsset(ResourceManager.getActivity().getSoundManager(), ResourceManager.getActivity(), "IntroGame.mp3");
 		}
 		catch (final IOException e) { Debug.e(e); }
-
 	}
 	
 	// ====================================================
@@ -84,22 +78,18 @@ public class SFXManager
 	public static void setSoundMuted(final boolean pMuted) {
 		getInstance().mSoundsMuted = pMuted;
 		setVolumeForAllSounds((getInstance().mSoundsMuted? 0f:1f));
-		//SharedResources.writeIntToSharedPreferences(SharedResources.SHARED_PREFS_SOUNDS_MUTED, (getInstance().mSoundsMuted? 1:0));
+		SharedResources.writeIntToSharedPreferences(SharedResources.SHARED_PREFS_SOUNDS_MUTED, (getInstance().mSoundsMuted? 1:0));
 	}
 	
 	public static boolean toggleSoundMuted() {
 		getInstance().mSoundsMuted = !getInstance().mSoundsMuted;
 		setVolumeForAllSounds((getInstance().mSoundsMuted? 0f:1f));
-		//SharedResources.writeIntToSharedPreferences(SharedResources.SHARED_PREFS_SOUNDS_MUTED, (getInstance().mSoundsMuted? 1:0));
+		SharedResources.writeIntToSharedPreferences(SharedResources.SHARED_PREFS_SOUNDS_MUTED, (getInstance().mSoundsMuted? 1:0));
 		return getInstance().mSoundsMuted;
 	}
 	
 	public static boolean isMusicMuted() {
 		return getInstance().mMusicMuted;
-	}
-
-	public static boolean isMusicGameMuted() {
-		return getInstance().mMusicGameMuted;
 	}
 
 	public static void setMusicMuted(final boolean pMuted) {
@@ -110,7 +100,7 @@ public class SFXManager
 		else {
 			mMusicMenu.play();
 		}
-		//SharedResources.writeIntToSharedPreferences(SharedResources.SHARED_PREFS_MUSIC_MUTED, (getInstance().mMusicMuted? 1:0));
+		SharedResources.writeIntToSharedPreferences(SharedResources.SHARED_PREFS_MUSIC_MUTED, (getInstance().mMusicMuted? 1:0));
 	}
 
 	public static boolean toggleMusicMuted() {
@@ -121,7 +111,7 @@ public class SFXManager
 		else {
 			mMusicMenu.play();
 		}
-		//SharedResources.writeIntToSharedPreferences(SharedResources.SHARED_PREFS_MUSIC_MUTED, (getInstance().mMusicMuted? 1:0));
+		SharedResources.writeIntToSharedPreferences(SharedResources.SHARED_PREFS_MUSIC_MUTED, (getInstance().mMusicMuted? 1:0));
 		return getInstance().mMusicMuted;
 	}
 
@@ -129,40 +119,30 @@ public class SFXManager
 	public static void playMusic() {
 		if(!isMusicMuted())
 		{
-
 			mMusicMenu.play();
 		}
 	}
 
-	
+	public static void PlayIntro() {
+		mIntro.setVolume(1f);
+		mIntro.setRate(1f);
+		mIntro.play();
+	}
 	public static void pauseMusic() {
 		mMusicMenu.pause();
 	}
 
-	public static void pauseMusicGame() {
-		mMusicGame.pause();
-	}
-	
 	public static void resumeMusic() {
 		if(!isMusicMuted())
 			mMusicMenu.resume();
 	}
 
-	public static void resumeMusicGame() {
-		if(!isMusicMuted())
-			mMusicGame.resume();
-	}
-	
 	public static float getMusicVolume() {
-        return mMusicMenu.getVolume();
+		return mMusicMenu.getVolume();
 	}
 	
 	public static void setMusicVolume(final float pVolume) {
 		mMusicMenu.setVolume(pVolume);
-	}
-
-	public static void setMusicGameVolume(final float pVolume) {
-		mMusicGame.setVolume(pVolume);
 	}
 
 	public static void playClick(final float pRate, final float pVolume) {
@@ -173,32 +153,15 @@ public class SFXManager
 		playSound(mClose,pRate,pVolume);
 	}
 
-
 	public static void playCoin(final float pRate, final float pVolume) {
 		playSound(mcoin,pRate,pVolume);
 	}
 
-	public static void playWaterSplash(float pRate, float pVolume) {
-		playSound(mWaterSplash,pRate,pVolume);
-	}
-
-	public static void PlayIntro() {
-
-        mIntro.setVolume(1f);
-		mIntro.setRate(1f);
-		mIntro.play();
-	}
 
 	private static void playSound(final Sound pSound, final float pRate, final float pVolume) {
 		if(SFXManager.isSoundMuted()) return;
 		pSound.setRate(pRate);
 		pSound.setVolume(pVolume);
 		pSound.play();
-	}
-
-	private static void IncrementSoundTank(final Sound pSound, final float pVolume, final float pRate) {
-		if(SFXManager.isSoundMuted()) return;
-		pSound.setVolume(pVolume);
-		pSound.setRate(pRate);
 	}
 }

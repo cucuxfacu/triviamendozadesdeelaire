@@ -44,21 +44,11 @@ public class MainMenu extends ManagedMenuScene {
 		return INSTANCE;
 	}
 	private Entity mHomeMenuScreen;
-	private Entity mPowerTankScreen;
-
-	private Sprite mTanAttackkBGSprite;
+	private Sprite mTriviaBGSprite;
 	private GrowButton mSettingButton;
 	private GrowButton mAbout;
 	private GrowButton mStore;
 	private static Text mCoinText;
-	private int intChange = 0;
-	private boolean lock = false;
-	private GrowButton btnChangePower;
-	private GrowButton btnChangeFriction;
-	private Sprite mCoinsChengePower;
-	private static Text mTextCoinsChangePower;
-	private Sprite mCoinsChangeFriction;
-	private static Text mTextCoinsChangeFriction;
 
 	// ====================================================
 	// CONSTRUCTOR
@@ -81,18 +71,18 @@ public class MainMenu extends ManagedMenuScene {
 	public Scene onLoadingScreenLoadAndShown() {
 		TriviaMendozaSmoothCamera.setupForMenus();
 		final Scene MenuLoadingScene = new Scene();
-		this.mTanAttackkBGSprite = new Sprite(0f, 0f, ResourceManager.menuBackgroundTR, ResourceManager.getActivity().getVertexBufferObjectManager());
-		this.mTanAttackkBGSprite.setScale(ResourceManager.getInstance().cameraHeight / ResourceManager.menuBackgroundTR.getHeight());
-		this.mTanAttackkBGSprite.setPosition((this.mTanAttackkBGSprite.getWidth() * this.mTanAttackkBGSprite.getScaleX()) / 2.3f, (this.mTanAttackkBGSprite.getHeight() * this.mTanAttackkBGSprite.getScaleY()) / 2f);
-		this.mTanAttackkBGSprite.setZIndex(-999);
-		MenuLoadingScene.attachChild(this.mTanAttackkBGSprite);
-		MenuLoadingScene.attachChild(new Text(mHalfCameraWidth, mHalfCameraHeight, ResourceManager.fontDefaultTankAtack60, ResourceManager.getContext().getText(R.string.app_loading), ResourceManager.getActivity().getVertexBufferObjectManager()));
+		this.mTriviaBGSprite = new Sprite(0f, 0f, ResourceManager.menuBackgroundTR, ResourceManager.getActivity().getVertexBufferObjectManager());
+		this.mTriviaBGSprite.setScale(ResourceManager.getInstance().cameraHeight / ResourceManager.menuBackgroundTR.getHeight());
+		this.mTriviaBGSprite.setPosition((this.mTriviaBGSprite.getWidth() * this.mTriviaBGSprite.getScaleX()) / 2.3f, (this.mTriviaBGSprite.getHeight() * this.mTriviaBGSprite.getScaleY()) / 2f);
+		this.mTriviaBGSprite.setZIndex(-999);
+		MenuLoadingScene.attachChild(this.mTriviaBGSprite);
+		MenuLoadingScene.attachChild(new Text(mHalfCameraWidth, mHalfCameraHeight, ResourceManager.fontDefault60, ResourceManager.getContext().getText(R.string.app_loading), ResourceManager.getActivity().getVertexBufferObjectManager()));
 		return MenuLoadingScene;
 	}
 
 	@Override
 	public void onLoadingScreenUnloadAndHidden() {
-		this.mTanAttackkBGSprite.detachSelf();
+		this.mTriviaBGSprite.detachSelf();
 	}
 
 	@Override
@@ -106,15 +96,14 @@ public class MainMenu extends ManagedMenuScene {
 				super.onManagedUpdate(pSecondsElapsed);
 				if (!this.hasLoaded) {
 					this.hasLoaded = true;
-					this.registerEntityModifier(new MoveModifier(0.20f, 0f, 0, 0f, 0f));
+					this.registerEntityModifier(new MoveModifier(0.25f, 0f, mCameraHeight, 0f, 0f));
 				}
 			}
 		};
+
 		final Sprite MainTitleText = new Sprite(0f, 0f, ResourceManager.menuMainTitleTR, ResourceManager.getActivity().getVertexBufferObjectManager());
 		MainTitleText.setPosition(mCameraWidth / 2f, mCameraHeight /2);
 		MainTitleText.setScale(0.5f);
-		ShowAdBanner();
-
 		/*GrowButton playButton = new GrowButton(mHalfCameraWidth + 750f, mHalfCameraHeight - 350f, ResourceManager.btnGreenCircleTTR) {
 			@Override
 			public void onClick() {
@@ -243,8 +232,8 @@ public class MainMenu extends ManagedMenuScene {
 		mExit.attachChild(mIconExit);
 		this.registerTouchArea(mExit);*/
 
-		/*this.mHomeMenuScreen.attachChild(playButton);
-		this.mHomeMenuScreen.attachChild(mUser);
+		this.mHomeMenuScreen.attachChild(MainTitleText);
+		/*this.mHomeMenuScreen.attachChild(mUser);
 		this.mHomeMenuScreen.attachChild(mUserLeaderBoard);
 		this.mHomeMenuScreen.attachChild(mGiftOfTheDay);
 		this.mHomeMenuScreen.attachChild(mSettingButton);
@@ -256,28 +245,12 @@ public class MainMenu extends ManagedMenuScene {
 
 		//InAppReview.getInstance().LoadAppReveview(SharedResources.getIntFromSharedPreferences(SharedResources.SHARED_PREFS_ACTIVITY_START_COUNT_RATING));
 		//VersionControl.getInstance().ControlVersion();
-		this.mHomeMenuScreen.attachChild(MainTitleText);
 		this.attachChild(this.mHomeMenuScreen);
 	}
 
 	private void GetInAppPurchase() {
 		//ShopMenu.getInstance().SetListenerBillingClient();
 		//ShopMenu.getInstance().StartConectionInAppPurchase();
-	}
-
-
-	@NonNull
-	private static GrowButton getGrowButton(GrowButton mUserLeaderBoard) {
-		GrowButton mGiftOfTheDay = new GrowButton(mUserLeaderBoard.getX(), mUserLeaderBoard.getY() - 200f, ResourceManager.btnGreenCircleTTR.getTextureRegion(0)) {
-			@Override
-			public void onClick() {
-				//SceneManager.getInstance().showLayer(GiftOfDayLayer.getInstance(), false, false, true);
-			}
-		};
-		Sprite mIconGiftOfTheDay = new Sprite(mUserLeaderBoard.getWidth() / 2f, mUserLeaderBoard.getHeight() / 2f, ResourceManager.sackOfCoinsTR, ResourceManager.getActivity().getVertexBufferObjectManager());
-		mIconGiftOfTheDay.setScale(0.68f);
-		mGiftOfTheDay.attachChild(mIconGiftOfTheDay);
-		return mGiftOfTheDay;
 	}
 
 	private static void LeaderBoard() {
@@ -295,8 +268,8 @@ public class MainMenu extends ManagedMenuScene {
 	@Override
 	public void onShowScene() {
 		TriviaMendozaSmoothCamera.setupForMenus();
-		if(!this.mTanAttackkBGSprite.hasParent()) {
-			this.attachChild(this.mTanAttackkBGSprite);
+		if(!this.mTriviaBGSprite.hasParent()) {
+			this.attachChild(this.mTriviaBGSprite);
 			this.sortChildren();
 		}
 		ShowAdBanner();
@@ -309,15 +282,6 @@ public class MainMenu extends ManagedMenuScene {
 		//mCoinText.setText(String.valueOf(SharedResources.getTotalsCoins()));
 	}
 
-
-
-
-
-	public void RefreshTextCoinsPower(CharSequence text) {
-		if(mTextCoinsChangePower !=null) {
-			mTextCoinsChangePower.setText(text);
-		}
-	}
 
 	/*private static void VerificationsDialogueUser() {
 		if(SharedResources.getIntFromSharedPreferences(SharedResources.SHARED_PREFS_ACTIVITY_START_USER)%3==0) {

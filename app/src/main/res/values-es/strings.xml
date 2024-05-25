@@ -2,9 +2,7 @@
     <string name="app_name">Trivias Mendoza desde el aire</string>
     <string name="app_loading">Cargando...</string>
     <string name="app_back">Volver</string>
-    <string name="app_id" translatable="false">120799424963</string>
     <string name="app_continuewith">Continuar con</string>
     <string name="app_continueWithGoogle">Continuar con Google</string>
     <string name="app_continueWithFacebook">Continuar con Facebook</string>
-    <string name="default_web_client_id" translatable="false">120799424963-c4bsls9nlvv2hlo3hb28moipv5q5nl2l.apps.googleusercontent.com</string>
 </resources>

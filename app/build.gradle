@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.androidApplication)
+    id 'com.google.gms.google-services'
 }
 
 android {
@@ -40,5 +41,14 @@ dependencies {
 
     implementation files('../libs/AndEngine.aar')
     implementation libs.play.services.ads
+    implementation libs.firebase.ui.auth
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+    implementation(libs.play.services.auth)
+    implementation libs.firebase.analytics
+
+    implementation libs.credentials
+    implementation libs.credentials.play.services.auth
+    implementation libs.googleid
 
 }

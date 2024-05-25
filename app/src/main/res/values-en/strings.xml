@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Trivias Mendoza desde el aire</string>
+    <string name="app_loading">Loading...</string>
+    <string name="app_back">Back</string>
+    <string name="app_continuewith">Continue With</string>
+    <string name="app_continueWithGoogle">Continue With Google</string>
+    <string name="app_continueWithFacebook">Continue With Facebook</string>
+</resources>

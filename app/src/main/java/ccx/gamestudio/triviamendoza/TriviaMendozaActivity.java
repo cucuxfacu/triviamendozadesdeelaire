@@ -1,14 +1,40 @@
 package ccx.gamestudio.triviamendoza;
 
-import android.os.Build;
+import android.content.Intent;
+import android.credentials.CredentialManager;
+import android.credentials.GetCredentialException;
+import android.credentials.GetCredentialRequest;
+import android.credentials.GetCredentialResponse;
+import android.os.Bundle;
+import android.os.CancellationSignal;
+import android.os.Handler;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.MeasureSpec;
 import android.widget.FrameLayout;
+import android.widget.Toast;
+
+import androidx.credentials.CredentialManagerCallback;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.auth.api.identity.BeginSignInRequest;
+import com.google.android.gms.auth.api.identity.SignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
+
+import com.google.android.gms.tasks.Task;
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption;
+import com.google.common.primitives.Bytes;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 
 import org.andengine.engine.Engine;
 import org.andengine.engine.options.EngineOptions;
@@ -19,13 +45,19 @@ import org.andengine.entity.scene.Scene;
 import org.andengine.opengl.view.RenderSurfaceView;
 import org.andengine.ui.activity.BaseGameActivity;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.concurrent.Executor;
 
 import ccx.gamestudio.triviamendoza.Helpers.SharedResources;
 import ccx.gamestudio.triviamendoza.Manager.ResourceManager;
 import ccx.gamestudio.triviamendoza.Manager.SFXManager;
 import ccx.gamestudio.triviamendoza.Manager.SceneManager;
-import ccx.gamestudio.triviamendoza.Menus.MainMenu;
+import ccx.gamestudio.triviamendoza.Menus.LoginMenu;
 import ccx.gamestudio.triviamendoza.Menus.SplashScreens;
 
 
@@ -34,9 +66,10 @@ public class TriviaMendozaActivity extends BaseGameActivity {
 	// Variables that hold references to the Layout and AdView
 	public static final String ADS_BANNER_DEV ="ca-app-pub-3940256099942544/9214589741";
 	public static final String ADS_BANNER_PRO ="ca-app-pub-9816948408338668/7932805578";
+	private static final int GOOGLE_SIGN_IN = 200;
+
 	public static FrameLayout mFrameLayout;
 	public static AdView adView;
-
 	public void ShowAds() {
 		this.runOnUiThread(() -> {
 			adView.setVisibility(View.VISIBLE);
@@ -58,7 +91,7 @@ public class TriviaMendozaActivity extends BaseGameActivity {
 				FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT,
 				Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
 		adView = new AdView(this);
-		adView.setAdUnitId(ADS_BANNER_PRO);
+		adView.setAdUnitId(ADS_BANNER_DEV);
 		adView.setVisibility(View.VISIBLE);
 		adView.setAdSize(AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(this, 320));
 		final FrameLayout.LayoutParams adViewLayoutParams =	new FrameLayout.LayoutParams(
@@ -91,6 +124,9 @@ public class TriviaMendozaActivity extends BaseGameActivity {
 	public float actualWindowHeightInches;
 	public TriviaMendozaSmoothCamera mCamera;
 	public static int numTimesActivityOpened;
+	private static FirebaseAuth mAuth;
+	private static FirebaseUser user = null;
+	private Handler handler;
 
 
 	// ====================================================
@@ -193,8 +229,8 @@ public class TriviaMendozaActivity extends BaseGameActivity {
 	@Override
 	public void onCreateScene(OnCreateSceneCallback pOnCreateSceneCallback) {
 		ResourceManager.loadMenuResources();
-		SceneManager.getInstance().showScene(new SplashScreens());
-		//SceneManager.getInstance().showScene(new MainMenu());
+		//SceneManager.getInstance().showScene(new SplashScreens());
+		SceneManager.getInstance().showScene(new LoginMenu());
 
 		pOnCreateSceneCallback.onCreateSceneFinished(mEngine.getScene());
 		SharedResources.writeFloatToSharedPreferences(SharedResources.SHARED_WINDOWS_WIDTH_INCHES, actualWindowWidthInches);
@@ -203,14 +239,13 @@ public class TriviaMendozaActivity extends BaseGameActivity {
 		//InAppLoginGooglePlayGameServices.getInstance().GoogleSignInitializate();
 		//SaveGame.getInstance().GetVersion();
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+		/*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 			if (!LocalDate.now().toString().equals(SharedResources.getStringFromSharedPreferences(SharedResources.SHARED_DATE))) {
 				SharedResources.writeStringToSharedPreferences(SharedResources.SHARED_DATE, LocalDate.now().toString());
 				SharedResources.writeIntToSharedPreferences(SharedResources.SHARED_COUNT_DATE, SharedResources.getIntFromSharedPreferences(SharedResources.SHARED_COUNT_DATE) + 1);
 				SharedResources.writeIntToSharedPreferences(SharedResources.SHARED_DAY_OFF, 0);
 			}
-		}
-
+		}*/
 	}
 
 	@Override
@@ -218,6 +253,75 @@ public class TriviaMendozaActivity extends BaseGameActivity {
 		pOnPopulateSceneCallback.onPopulateSceneFinished();
 	}
 
+
+	public static void SignInGoogle() throws NoSuchAlgorithmException {
+		//LogInGoogle();
+	}
+
+
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if (requestCode == GOOGLE_SIGN_IN && data != null) {
+			try {
+				Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+				GoogleSignInAccount account = task.getResult(ApiException.class);
+				if (account != null) {
+					user = FirebaseAuth(account);
+					//if (user != null) {
+					SharedResources.writeStringToSharedPreferences(SharedResources.SHARED_USER_EMAIL, account.getEmail());
+					SharedResources.writeStringToSharedPreferences(SharedResources.SHARED_USER_NAME_LASTNAME, account.getDisplayName());
+
+				}
+			} catch (ApiException e) {
+				ResourceManager.getActivity().runOnUiThread(() ->
+						Toast.makeText(ResourceManager.getActivity(), String.valueOf(e),
+								Toast.LENGTH_SHORT).show());
+			}
+		}
+	}
+
+	public static boolean LogOutGoogleAndFirebase() {
+		FirebaseAuth.getInstance().signOut();
+		return true;
+	}
+
+	private FirebaseUser FirebaseAuth(GoogleSignInAccount account) {
+		try{
+			AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
+			handler = new Handler();
+			handler.postDelayed(() -> {
+
+				if (mAuth.getCurrentUser() == null) {
+					mAuth.signInWithCredential(credential).addOnCompleteListener(ResourceManager.getActivity(), task -> {
+						if (task.isSuccessful()) {
+							user = FirebaseAuth.getInstance().getCurrentUser();
+							Log.v("Usuario", "Usuario: " + user);
+						} else {
+							String message =Objects.requireNonNull(task.getException()).getMessage();
+							ResourceManager.getActivity().runOnUiThread(() ->
+									Toast.makeText(ResourceManager.getActivity(), message,
+											Toast.LENGTH_SHORT).show());
+						}
+					});
+					user = mAuth.getCurrentUser();
+				}else {
+					user = mAuth.getCurrentUser();
+				}
+			}, 2000);
+
+		}catch (Exception e){
+			ResourceManager.getActivity().runOnUiThread(() ->
+					Toast.makeText(ResourceManager.getActivity(), String.valueOf(e),
+							Toast.LENGTH_SHORT).show());
+		}
+		return user;
+	}
+
+
+
+	// ====================================================
+	// CICLO DE VIDA
+	// ====================================================
 	@Override
 	protected void onDestroy() {
 		adView.destroy();
