@@ -6,5 +6,5 @@
     <string name="app_continuewith">Continuar con</string>
     <string name="app_continueWithGoogle">Continuar con Google</string>
     <string name="app_continueWithFacebook">Continuar con Facebook</string>
-    <string name="default_web_client_id" translatable="false">120799424963-c4bsls9nlvv2hlo3hb28moipv5q5nl2l.apps.googleusercontent.com</string>
+    <string name="app_worklofin">Estámos trabajando para que puedas acceder con Facebook</string>
 </resources>

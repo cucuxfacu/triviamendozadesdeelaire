@@ -1,5 +1,7 @@
 package ccx.gamestudio.triviamendoza.Menus;
 
+import android.widget.Toast;
+
 import org.andengine.entity.Entity;
 import org.andengine.entity.modifier.MoveModifier;
 import org.andengine.entity.scene.Scene;
@@ -9,10 +11,13 @@ import org.andengine.entity.text.Text;
 import org.andengine.entity.text.TextOptions;
 import org.andengine.util.adt.align.HorizontalAlign;
 
+import java.security.NoSuchAlgorithmException;
+
 import ccx.gamestudio.triviamendoza.Input.GrowButton;
 import ccx.gamestudio.triviamendoza.Manager.ResourceManager;
 import ccx.gamestudio.triviamendoza.Manager.SceneManager;
 import ccx.gamestudio.triviamendoza.R;
+import ccx.gamestudio.triviamendoza.TriviaMendozaActivity;
 import ccx.gamestudio.triviamendoza.TriviaMendozaSmoothCamera;
 
 public class LoginMenu extends ManagedMenuScene {
@@ -95,8 +100,8 @@ public class LoginMenu extends ManagedMenuScene {
 		continueWith.setColor(1,1,1);
 		GrowButton btnLoginGoogle = new GrowButton(mHalfCameraWidth, mHalfCameraHeight - 270f, ResourceManager.btnLoginGoogle) {
 			@Override
-			public void onClick() {
-				SceneManager.getInstance().showScene(new MainMenu());
+			public void onClick()  {
+				TriviaMendozaActivity.SignInGoogle();
 			}
 		};
 		btnLoginGoogle.setScales(0.4f,0.45f);
@@ -110,7 +115,9 @@ public class LoginMenu extends ManagedMenuScene {
 		GrowButton btnLoginFacebook = new GrowButton(mHalfCameraWidth, mHalfCameraHeight - 346f, ResourceManager.btnLoginFacebook) {
 			@Override
 			public void onClick() {
-				SceneManager.getInstance().showScene(new MainMenu());
+				ResourceManager.getActivity().runOnUiThread(() ->
+						Toast.makeText(ResourceManager.getActivity(), "Estámos trabajando para que puedas acceder con Facebook",
+								Toast.LENGTH_SHORT).show());
 			}
 		};
 		btnLoginFacebook.setScales(0.4f,0.45f);

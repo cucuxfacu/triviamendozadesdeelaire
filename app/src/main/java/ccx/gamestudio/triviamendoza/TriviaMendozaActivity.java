@@ -1,12 +1,7 @@
 package ccx.gamestudio.triviamendoza;
 
 import android.content.Intent;
-import android.credentials.CredentialManager;
-import android.credentials.GetCredentialException;
-import android.credentials.GetCredentialRequest;
-import android.credentials.GetCredentialResponse;
 import android.os.Bundle;
-import android.os.CancellationSignal;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
@@ -15,13 +10,9 @@ import android.view.View.MeasureSpec;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import androidx.credentials.CredentialManagerCallback;
-
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.auth.api.identity.BeginSignInRequest;
-import com.google.android.gms.auth.api.identity.SignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -29,8 +20,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 
 import com.google.android.gms.tasks.Task;
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption;
-import com.google.common.primitives.Bytes;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -45,20 +35,13 @@ import org.andengine.entity.scene.Scene;
 import org.andengine.opengl.view.RenderSurfaceView;
 import org.andengine.ui.activity.BaseGameActivity;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.Objects;
-import java.util.UUID;
-import java.util.concurrent.Executor;
 
 import ccx.gamestudio.triviamendoza.Helpers.SharedResources;
 import ccx.gamestudio.triviamendoza.Manager.ResourceManager;
 import ccx.gamestudio.triviamendoza.Manager.SFXManager;
 import ccx.gamestudio.triviamendoza.Manager.SceneManager;
 import ccx.gamestudio.triviamendoza.Menus.LoginMenu;
-import ccx.gamestudio.triviamendoza.Menus.SplashScreens;
 
 
 public class TriviaMendozaActivity extends BaseGameActivity {
@@ -127,7 +110,10 @@ public class TriviaMendozaActivity extends BaseGameActivity {
 	private static FirebaseAuth mAuth;
 	private static FirebaseUser user = null;
 	private Handler handler;
+	private static final int REQ_ONE_TAP = 2;  // Can be any integer unique to the Activity.
+	private boolean showOneTapUI = true;
 
+	private static GoogleSignInClient mGoogleSignClient;
 
 	// ====================================================
 	// CREATE ENGINE
@@ -166,15 +152,17 @@ public class TriviaMendozaActivity extends BaseGameActivity {
 
 				// Get the height for the camera based on the width and the
 				// height/width ratio of the device
-				float boundScaledHeightInPixels = boundScaledWidthInPixels
-						* (actualWindowHeightInches / actualWindowWidthInches);
+				float boundScaledHeightInPixels = boundScaledWidthInPixels	* (actualWindowHeightInches / actualWindowWidthInches);
 				// If the height is outside of the set bounds, scale the width
 				// to match it.
-				if (boundScaledHeightInPixels > MAX_HEIGHT_PIXELS) {
+				if (boundScaledHeightInPixels > MAX_HEIGHT_PIXELS)
+				{
 					float boundAdjustmentRatio = MAX_HEIGHT_PIXELS / boundScaledHeightInPixels;
 					boundScaledWidthInPixels *= boundAdjustmentRatio;
 					boundScaledHeightInPixels *= boundAdjustmentRatio;
-				} else if (boundScaledHeightInPixels < MIN_HEIGHT_PIXELS) {
+
+				} else if (boundScaledHeightInPixels < MIN_HEIGHT_PIXELS)
+				{
 					float boundAdjustmentRatio = MIN_HEIGHT_PIXELS / boundScaledHeightInPixels;
 					boundScaledWidthInPixels *= boundAdjustmentRatio;
 					boundScaledHeightInPixels *= boundAdjustmentRatio;
@@ -236,6 +224,7 @@ public class TriviaMendozaActivity extends BaseGameActivity {
 		SharedResources.writeFloatToSharedPreferences(SharedResources.SHARED_WINDOWS_WIDTH_INCHES, actualWindowWidthInches);
 
 
+		mAuth = FirebaseAuth.getInstance();
 		//InAppLoginGooglePlayGameServices.getInstance().GoogleSignInitializate();
 		//SaveGame.getInstance().GetVersion();
 
@@ -254,19 +243,35 @@ public class TriviaMendozaActivity extends BaseGameActivity {
 	}
 
 
-	public static void SignInGoogle() throws NoSuchAlgorithmException {
+	public static void SignInGoogle() {
 		//LogInGoogle();
+		GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
+				.requestIdToken(ResourceManager.getActivity().getString(R.string.default_web_client_id))
+				.requestEmail()
+				.build();
+		mGoogleSignClient = GoogleSignIn.getClient(ResourceManager.getActivity(), gso);
+		LogOutGooglePlayGame();
+		ResourceManager.getActivity().startActivityForResult(mGoogleSignClient.getSignInIntent(), GOOGLE_SIGN_IN);
 	}
 
+	public static void LogOutGooglePlayGame() {
+		mGoogleSignClient.signOut().addOnCompleteListener(ResourceManager.getActivity(),
+                task -> {
+                    boolean successful = task.isSuccessful();
+                });
+		LogOutGoogleAndFirebase();
+	}
 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
+
 		if (requestCode == GOOGLE_SIGN_IN && data != null) {
 			try {
 				Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
 				GoogleSignInAccount account = task.getResult(ApiException.class);
 				if (account != null) {
 					user = FirebaseAuth(account);
+					Log.v("Usuario", "Usuario google: " + account.getDisplayName());
 					//if (user != null) {
 					SharedResources.writeStringToSharedPreferences(SharedResources.SHARED_USER_EMAIL, account.getEmail());
 					SharedResources.writeStringToSharedPreferences(SharedResources.SHARED_USER_NAME_LASTNAME, account.getDisplayName());
@@ -276,47 +281,46 @@ public class TriviaMendozaActivity extends BaseGameActivity {
 				ResourceManager.getActivity().runOnUiThread(() ->
 						Toast.makeText(ResourceManager.getActivity(), String.valueOf(e),
 								Toast.LENGTH_SHORT).show());
+				Log.v("Usuario", "Usuario: " + String.valueOf(e));
 			}
 		}
 	}
 
-	public static boolean LogOutGoogleAndFirebase() {
-		FirebaseAuth.getInstance().signOut();
-		return true;
-	}
-
 	private FirebaseUser FirebaseAuth(GoogleSignInAccount account) {
-		try{
+		try {
 			AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
-			handler = new Handler();
-			handler.postDelayed(() -> {
 
-				if (mAuth.getCurrentUser() == null) {
-					mAuth.signInWithCredential(credential).addOnCompleteListener(ResourceManager.getActivity(), task -> {
-						if (task.isSuccessful()) {
-							user = FirebaseAuth.getInstance().getCurrentUser();
-							Log.v("Usuario", "Usuario: " + user);
-						} else {
-							String message =Objects.requireNonNull(task.getException()).getMessage();
-							ResourceManager.getActivity().runOnUiThread(() ->
-									Toast.makeText(ResourceManager.getActivity(), message,
-											Toast.LENGTH_SHORT).show());
-						}
-					});
-					user = mAuth.getCurrentUser();
-				}else {
-					user = mAuth.getCurrentUser();
-				}
-			}, 2000);
+			if (mAuth.getCurrentUser() == null) {
+				mAuth.signInWithCredential(credential).addOnCompleteListener(ResourceManager.getActivity(), task -> {
+					if (task.isSuccessful()) {
+						user = mAuth.getCurrentUser();
+						SendLoginToFireBase();
+						Log.v("Usuario", "Usuario firebase: " + user.getEmail());
+					} else {
+						String message = Objects.requireNonNull(task.getException()).getMessage();
+						Log.v("Usuario", "Usuario error:  " + message);
+					}
+				});
+				user = mAuth.getCurrentUser();
+			} else {
+				user = mAuth.getCurrentUser();
+			}
 
-		}catch (Exception e){
-			ResourceManager.getActivity().runOnUiThread(() ->
-					Toast.makeText(ResourceManager.getActivity(), String.valueOf(e),
-							Toast.LENGTH_SHORT).show());
+		} catch (Exception e) {
+			Log.v("Usuario", "Usuario Exception:  " + e.getMessage());
 		}
 		return user;
 	}
 
+	public static void LogOutGoogleAndFirebase() {
+		FirebaseAuth.getInstance().signOut();
+	}
+	private static void SendLoginToFireBase() {
+		FirebaseAnalytics analitycs = FirebaseAnalytics.getInstance(ResourceManager.getActivity());
+		Bundle bundle = new Bundle();
+		bundle.putString("Login", "usuario se loguea" );
+		analitycs.logEvent(FirebaseAnalytics.Event.LOGIN, bundle);
+	}
 
 
 	// ====================================================

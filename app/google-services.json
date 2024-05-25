@@ -14,11 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "120799424963-kjcj22dfggc9s80j8gc7jp98dj7oihb3.apps.googleusercontent.com",
+          "client_id": "120799424963-go0k5gv65ot7jc05vdf9od2fvh1sb7tq.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "ccx.gamestudio.triviamendoza",
-            "certificate_hash": "9bbb3186b2189ef16d8f272bdab59362c395cbb4"
+            "certificate_hash": "451067a81d7ef82bf5ac52e2cade6bb6a2c3732c"
           }
         },
         {
@@ -27,6 +27,14 @@
           "android_info": {
             "package_name": "ccx.gamestudio.triviamendoza",
             "certificate_hash": "6abdc599cf32479ef6793c9154ed1f467394398d"
+          }
+        },
+        {
+          "client_id": "120799424963-t8s6jk3pjc4so45hkn1stg4mvhbu787q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ccx.gamestudio.triviamendoza",
+            "certificate_hash": "f0e259c22c34b9587d9050f4a8a65c95c62c73ca"
           }
         },
         {
@@ -45,13 +53,6 @@
             {
               "client_id": "120799424963-c4bsls9nlvv2hlo3hb28moipv5q5nl2l.apps.googleusercontent.com",
               "client_type": 3
-            },
-            {
-              "client_id": "120799424963-bp8lum44bble6st0r2f7ug20uc399thi.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "ccx.gamestudio.triviamendoza"
-              }
             }
           ]
         }
